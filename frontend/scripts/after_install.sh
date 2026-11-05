@@ -2,7 +2,8 @@
 set -e
 
 echo "Setting permissions on frontend files"
-chown -R nginx:nginx /usr/share/nginx/html/dist
-chmod -R 755 /usr/share/nginx/html/dist
+
+chown -R nginx:nginx /usr/share/nginx/html
+chmod -R 755 /usr/share/nginx/html
 
 echo "Permissions set successfully"
