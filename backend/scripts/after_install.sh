@@ -6,11 +6,11 @@ npm install
 
 echo "Writing environment configuration"
 cat > /home/ec2-user/app/backend/.env << ENVEOF
-DB_HOST=react-node-mysql-db.cxy6mmic0h2s.eu-west-2.rds.amazonaws.com
+DB_HOST=lirw-mysql-db.clkwiuasu306.ap-south-1.rds.amazonaws.com
 DB_PORT=3306
 DB_USER=admin
-DB_PASSWORD=Igbogbo1997&
-DB_NAME=react_node_app
+DB_PASSWORD=apnkan911
+DB_NAME=lirwdb
 PORT=3200
 ENVEOF
 
