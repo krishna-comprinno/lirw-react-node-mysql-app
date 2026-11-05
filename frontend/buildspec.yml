@@ -1,9 +1,5 @@
 version: 0.2
 
-env:
-  variables:
-    VITE_API_URL: "http://13.40.131.226/api"
-
 phases:
   install:
     runtime-versions:

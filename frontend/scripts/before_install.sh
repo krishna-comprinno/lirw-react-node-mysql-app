@@ -2,7 +2,9 @@
 set -e
 
 echo "Cleaning previous frontend deployment"
-rm -rf /usr/share/nginx/html/dist
-mkdir -p /usr/share/nginx/html/dist
 
-echo "Clean complete"
+mkdir -p /usr/share/nginx/html
+
+find /usr/share/nginx/html -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+
+echo "Frontend directory cleaned successfully"
