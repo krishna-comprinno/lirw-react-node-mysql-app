@@ -8,6 +8,11 @@ phases:
     commands:
       - npm install --prefix frontend
 
+  pre_build:
+    commands:
+      - echo "Configuring frontend API URL"
+      - echo "VITE_API_URL=/api" > frontend/.env.production
+
   build:
     commands:
       - npm run build --prefix frontend
