@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "Restarting NGINX"
+nginx -t
 systemctl restart nginx
+systemctl enable nginx
 
-echo "NGINX restarted successfully"
+echo "Nginx restarted successfully"git

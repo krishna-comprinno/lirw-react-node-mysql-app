@@ -1,3 +1,4 @@
+
 version: 0.2
 
 phases:
@@ -20,5 +21,6 @@ artifacts:
   files:
     - appspec.yml
     - scripts/**/*
+    - nginx/**/*
     - dist/**/*
   discard-paths: no
