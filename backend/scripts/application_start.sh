@@ -3,34 +3,18 @@ set -e
 
 APP_DIR="/home/ec2-user/app/backend"
 
-echo "Creating backend systemd service"
+echo "Starting backend application using PM2"
 
-cat > /etc/systemd/system/backend.service <<'EOF'
-[Unit]
-Description=Node.js Backend API
-After=network.target
+cd "$APP_DIR"
 
-[Service]
-Type=simple
-User=ec2-user
-Group=ec2-user
-WorkingDirectory=/home/ec2-user/app/backend
-EnvironmentFile=/home/ec2-user/app/backend/.env
-ExecStart=/usr/bin/node /home/ec2-user/app/backend/server.js
-Restart=always
-RestartSec=5
+# Start the backend application
+sudo -u ec2-user -H pm2 start server.js --name backend
 
-[Install]
-WantedBy=multi-user.target
-EOF
+echo "Configuring PM2 to start automatically after reboot"
 
-echo "Reloading systemd"
-systemctl daemon-reload
+pm2 startup systemd -u ec2-user --hp /home/ec2-user
 
-echo "Enabling backend service"
-systemctl enable backend
+# Save the running application list
+sudo -u ec2-user -H pm2 save
 
-echo "Starting backend service"
-systemctl restart backend
-
-echo "Backend systemd service started"
+echo "Backend application started successfully"
