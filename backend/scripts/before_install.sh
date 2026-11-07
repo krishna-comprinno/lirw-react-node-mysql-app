@@ -3,15 +3,18 @@ set -e
 
 APP_DIR="/home/ec2-user/app/backend"
 
-echo "Stopping old backend application"
+echo "Stopping old systemd backend"
+
+systemctl stop backend || true
+systemctl disable backend || true
+
+echo "Removing old PM2 backend"
 
 sudo -u ec2-user -H pm2 delete backend || true
 
-echo "Cleaning old application files"
+echo "Cleaning old application"
 
 rm -rf "$APP_DIR"
-
-echo "Creating application directory"
 
 mkdir -p "$APP_DIR"
 
