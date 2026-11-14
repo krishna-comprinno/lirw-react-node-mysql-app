@@ -1,31 +1,36 @@
 
 version: 0.2
 
-phases:
-  install:
-    runtime-versions:
-      nodejs: 18
-    commands:
-      - npm install --prefix frontend
+env:
+  variables:
+    AWS_REGION: ap-south-1
+    AWS_ACCOUNT_ID: "540659181038"
+    ECR_REPOSITORY: three-tier-frontend
 
+phases:
   pre_build:
     commands:
-      - echo "Configuring frontend API URL"
-      - echo "VITE_API_URL=/api" > frontend/.env.production
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - if [ -z "$IMAGE_TAG" ]; then export IMAGE_TAG=$CODEBUILD_BUILD_NUMBER; fi
+      - export IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
 
   build:
     commands:
-      - npm run build --prefix frontend
+      - echo "Building frontend Docker image..."
+      - docker build --build-arg VITE_API_URL=/api -t $IMAGE_URI:$IMAGE_TAG -f frontend/Dockerfile frontend
 
   post_build:
     commands:
-      - echo "Frontend build complete"
+      - echo "Pushing frontend image to ECR..."
+      - docker push $IMAGE_URI:$IMAGE_TAG
+      - echo "Generating imageDetail.json..."
+      - printf '{"ImageURI":"%s"}' "$IMAGE_URI:$IMAGE_TAG" > imageDetail.json
+      - echo "Frontend image pushed successfully"
 
 artifacts:
-  base-directory: frontend
   files:
-    - appspec.yml
-    - scripts/**/*
-    - nginx/**/*
-    - dist/**/*
-  discard-paths: no
+    - imageDetail.json
+    - frontend/taskdef.json
+    - frontend/appspec.yaml
