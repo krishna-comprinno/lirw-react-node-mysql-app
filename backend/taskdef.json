@@ -1,0 +1,53 @@
+
+{
+  "family": "three-tier-backend-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "executionRoleArn": "arn:aws:iam::540659181038:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "backend-container",
+      "image": "<IMAGE1_NAME>",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3200,
+          "hostPort": 3200,
+          "protocol": "tcp"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DB_HOST",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:540659181038:secret:three-tier/backend/db-MLlCIP:DB_HOST::"
+        },
+        {
+          "name": "DB_PORT",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:540659181038:secret:three-tier/backend/db-MLlCIP:DB_PORT::"
+        },
+        {
+          "name": "DB_USER",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:540659181038:secret:three-tier/backend/db-MLlCIP:DB_USER::"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:540659181038:secret:three-tier/backend/db-MLlCIP:DB_PASSWORD::"
+        },
+        {
+          "name": "DB_NAME",
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:540659181038:secret:three-tier/backend/db-MLlCIP:DB_NAME::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/three-tier-backend-task",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

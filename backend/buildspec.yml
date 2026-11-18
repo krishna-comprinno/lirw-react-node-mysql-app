@@ -1,31 +1,37 @@
+
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: ap-south-1
+    AWS_ACCOUNT_ID: "540659181038"
+    ECR_REPOSITORY: three-tier-backend
+
 phases:
-  install:
-    runtime-versions:
-      nodejs: 18
+  pre_build:
     commands:
-      - npm install --prefix backend
+      - echo Logging in to Amazon ECR
+      - ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      - ECR_REPOSITORY_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}"
+      - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+      - IMAGE_TAG=$(echo "${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}" | cut -c 1-7)
+      - echo "Building image $ECR_REPOSITORY_URI:$IMAGE_TAG"
 
   build:
     commands:
-      - echo "Backend build complete"
+      - docker build -t "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}:${CODEBUILD_RESOLVED_SOURCE_VERSION:0:7}" -f backend/Dockerfile backend/
 
   post_build:
     commands:
-      - echo "Backend packaging complete"
+      - ECR_REPOSITORY_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}"
+      - IMAGE_TAG=$(echo "${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}" | cut -c 1-7)
+      - docker push "$ECR_REPOSITORY_URI:$IMAGE_TAG"
+      - printf '{"ImageURI":"%s"}' "$ECR_REPOSITORY_URI:$IMAGE_TAG" > backend/imageDetail.json
+      - echo Backend Docker image pushed successfully
 
 artifacts:
   base-directory: backend
   files:
-    - appspec.yml
-    - scripts/**/*
-    - app.js
-    - server.js
-    - package.json
-    - package-lock.json
-    - db.sql
-    - configs/**/*
-    - controllers/**/*
-    - routes/**/*
-  discard-paths: no
+    - appspec.yaml
+    - taskdef.json
+    - imageDetail.json
