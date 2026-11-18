@@ -10,6 +10,7 @@
     {
       "name": "backend-container",
       "image": "<IMAGE1_NAME>",
+      "memoryReservation": 512,
       "essential": true,
       "portMappings": [
         {
